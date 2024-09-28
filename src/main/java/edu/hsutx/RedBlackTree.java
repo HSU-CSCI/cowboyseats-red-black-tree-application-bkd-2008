@@ -26,27 +26,53 @@ public class RedBlackTree<E> {
         public Node left;
         public Node right;
         public Node parent;
-        public boolean color; // true = red, false = black
+        public boolean isRed; // true = red, false = black
+
+        /**
+         * Method to create an existing node with no key
+         */
+        public Node() {
+            this.key = null;
+            this.value = null;
+            this.parent = null;
+            this.left = null;
+            this.right = null;
+            this.isRed = false;     //is a leaf, so is always black
+        }
 
         public Node(String key, E value, Node parent, boolean color) {
             this.key = key;
             this.value = value;
             this.parent = parent;
-            this.left = null;
-            this.right = null;
-            this.color = color;
+            this.left = new Node();
+            this.right = new Node();
+            this.isRed = color;
         }
 
         // TODO - add comments as appropriate including a javadoc for each method
         public int getDepth() {
             // TODO - calculate the depth of the node and return an int value.
             // Hint: follow parent pointers up to the root and count steps
-            return 0;
+            int depth = 1;  //start including the node being checked
+            Node current = this.parent;
+            while (current != null) {
+                depth++;
+                current = current.parent;
+            }
+            return depth;
         }
 
         public int getBlackDepth() {
             // TODO - calculate the depth of the node counting only black nodes and return an int value
-            return 0;
+            int depth = 1;  //start including the node being checked
+            Node current = this.parent;
+            while (current != null) {
+                if(!current.isRed) {
+                    depth++;
+                }
+                current = current.parent;
+            }
+            return depth;
         }
     }
 
@@ -61,6 +87,22 @@ public class RedBlackTree<E> {
         // 1. Insert the node as you would in a regular BST.
         // 2. Recolor and rotate to restore Red-Black Tree properties.
         // Make sure to add 1 to size if node is successfully added
+        if (root == null) {
+            root = new Node(key, value, null, false);   //empty case, root must be black
+            return;
+        }
+        Node newNode = find(key);
+        if (newNode.key != null) {
+            return;     //a node with this key already exists
+        }
+
+        newNode = new Node(key, value, newNode.parent, true);
+        if (newNode.key.compareTo(newNode.parent.key) < 0) {
+            newNode.parent.left = newNode;
+        } else {
+            newNode.parent.right = newNode;
+        }
+        fixInsertion(newNode);
     }
 
     public void delete(String key) {
@@ -98,13 +140,25 @@ public class RedBlackTree<E> {
         // TODO - Search for the node with the given key
         // If the key exists in the tree, return the Node where it is located
         // Otherwise, return null
-        return null;
+        Node current = root;
+        while (current.key != null && current.key != key) {
+            if (key.compareTo(current.key) < 0) {
+                current = current.left;
+            } else {
+                current = current.right;
+            }
+        }
+        return current;
     }
 
     public E getValue(String key) {
         // TODO - Use find() to locate the node with the given key and return its value
         // If the key does not exist, return null
-        return null;
+        Node getNode = find(key);
+        if (getNode.key == null) {
+            return null;
+        }
+        return getNode.value;
     }
 
     public boolean isEmpty() {
@@ -120,11 +174,11 @@ public class RedBlackTree<E> {
 
     // Helper methods to check the color of a node
     private boolean isRed(Node node) {
-        return node != null && node.color == true; // Red is true
+        return node != null && node.isRed == true; // Red is true
     }
 
     private boolean isBlack(Node node) {
-        return node == null || node.color == false; // Black is false, and null nodes are black
+        return node == null || node.isRed == false; // Black is false, and null nodes are black
     }
     public int getSize() {
         return size;
