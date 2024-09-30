@@ -31,10 +31,10 @@ public class RedBlackTree<E> {
         /**
          * Method to create an existing node with no key
          */
-        public Node() {
+        public Node(Node parent) {
             this.key = null;
             this.value = null;
-            this.parent = null;
+            this.parent = parent;
             this.left = null;
             this.right = null;
             this.isRed = false;     //is a leaf, so is always black
@@ -44,8 +44,8 @@ public class RedBlackTree<E> {
             this.key = key;
             this.value = value;
             this.parent = parent;
-            this.left = new Node();
-            this.right = new Node();
+            this.left = new Node(this);
+            this.right = new Node(this);
             this.isRed = color;
         }
 
@@ -82,13 +82,9 @@ public class RedBlackTree<E> {
     }
 
     public void insert(String key, E value) {
-        // TODO - Insert a new node into the tree with key and value
-        // You must handle rebalancing the tree after inserting
-        // 1. Insert the node as you would in a regular BST.
-        // 2. Recolor and rotate to restore Red-Black Tree properties.
-        // Make sure to add 1 to size if node is successfully added
         if (root == null) {
             root = new Node(key, value, null, false);   //empty case, root must be black
+            size++;
             return;
         }
         Node newNode = find(key);
@@ -102,6 +98,7 @@ public class RedBlackTree<E> {
         } else {
             newNode.parent.right = newNode;
         }
+        size++;
         fixInsertion(newNode);
     }
 
@@ -118,6 +115,8 @@ public class RedBlackTree<E> {
     private void fixInsertion(Node node) {
         // TODO - Implement the fix-up procedure after insertion
         // Ensure that Red-Black Tree properties are maintained (recoloring and rotations).
+        // You must handle rebalancing the tree after inserting
+        // Recolor and rotate to restore Red-Black Tree properties.
         // Hint: You will need to deal with red-red parent-child conflicts
     }
 
