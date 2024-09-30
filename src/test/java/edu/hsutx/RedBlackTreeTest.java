@@ -86,6 +86,20 @@ public class RedBlackTreeTest {
     }
 
     @Test
+    public void testInsertWithRedParentAndUncle() {
+        tree.insert("b", 2);
+        tree.insert("a", 1);
+        tree.insert("c", 3);
+        tree.insert("d", 4);
+
+        assertTrue(tree.validateRedBlackTree(), "Tree should be valid after insertions requiring recoloring.");
+        assertEquals(1, tree.getValue("a"));
+        assertEquals(2, tree.getValue("b"));
+        assertEquals(3, tree.getValue("c"));
+        assertEquals(4, tree.getValue("d"));
+    }
+
+    @Test
     public void testInsertRequiresLeftRotation() {
         // Insert nodes in ascending order to cause left rotations
         tree.insert("a", 1);

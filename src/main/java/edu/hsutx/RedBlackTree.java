@@ -118,6 +118,22 @@ public class RedBlackTree<E> {
         // You must handle rebalancing the tree after inserting
         // Recolor and rotate to restore Red-Black Tree properties.
         // Hint: You will need to deal with red-red parent-child conflicts
+        if (node == root) {
+            node.isRed = false;
+            return;
+        }
+        if (!node.parent.isRed) {
+            return;     //no color conflicts
+        }
+
+        Node uncle = getUncle(node);
+        Node grandparent = uncle.parent;
+        if (uncle.isRed) {
+            node.parent.isRed = false;
+            uncle.isRed = false;
+            grandparent.isRed = true;
+            fixInsertion(grandparent);
+        }
     }
 
     private void fixDeletion(Node node) {
@@ -158,6 +174,15 @@ public class RedBlackTree<E> {
             return null;
         }
         return getNode.value;
+    }
+
+    private Node getUncle(Node n) {
+        Node grandparent = n.parent.parent;
+        if (grandparent.left == n.parent) {
+            return grandparent.right;
+        } else {
+            return grandparent.left;
+        }
     }
 
     public boolean isEmpty() {
