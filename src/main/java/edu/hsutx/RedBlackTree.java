@@ -173,12 +173,15 @@ public class RedBlackTree<E> {
         }
 
         //moves the parent to the grandparent's position
-        if (grandparent.isRightChild(grandparent.parent)) {
-            grandparent.parent.left = parent;
-        } else {
-            grandparent.parent.right = parent;
+        if (grandparent != root) {
+            if (grandparent.isRightChild(grandparent.parent)) {
+                grandparent.parent.left = parent;
+            } else {
+                grandparent.parent.right = parent;
+            }
         }
         parent.parent = grandparent.parent;
+        root = parent;
 
         //moves the grandparent to the parent's child
         if (node.isRightChild(parent)) {
@@ -189,6 +192,9 @@ public class RedBlackTree<E> {
 
         //moves the sibling to the grandparent's child, should always be right child for left rotation
         grandparent.right = sibling;
+
+        parent.isRed = false;
+        grandparent.isRed = true;
     }
 
     private void rotateRight(Node node) {

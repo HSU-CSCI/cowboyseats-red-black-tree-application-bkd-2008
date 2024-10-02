@@ -273,7 +273,7 @@ public class RedBlackTreeTest {
         tree.insert("cherry", 3);
 
         assertNotNull(tree.find("banana"), "Find should return a node for existing key.");
-        assertNull(tree.find("date"), "Find should return null for nonexistent key.");
+        assertNull(tree.find("date").key, "Find should return null for nonexistent key.");
     }
 
 
