@@ -166,27 +166,27 @@ public class RedBlackTree<E> {
         Node grandparent = parent.parent;
         Node sibling;
 
-        if (node.isRightChild(parent)) {
-            sibling = parent.left;
-        } else {
-            sibling = parent.right;
-        }
 
         //moves the parent to the grandparent's position
-        if (grandparent != root) {
+        if (grandparent == root) {
+            root = parent;
+        } else {
             if (grandparent.isRightChild(grandparent.parent)) {
-                grandparent.parent.left = parent;
-            } else {
                 grandparent.parent.right = parent;
+            } else {
+                grandparent.parent.left = parent;
             }
         }
         parent.parent = grandparent.parent;
-        root = parent;
+        grandparent.parent = parent;
+
 
         //moves the grandparent to the parent's child
         if (node.isRightChild(parent)) {
+            sibling = parent.left;
             parent.left = grandparent;
         } else {
+            sibling = parent.right;
             parent.right = grandparent;
         }
 
@@ -200,12 +200,42 @@ public class RedBlackTree<E> {
     private void rotateRight(Node node) {
         // TODO - Implement right rotation
         // Right rotation is used to restore balance after insertion or deletion
+        Node parent = node.parent;
+        Node grandparent = parent.parent;
+        Node sibling;
+
+        //moves parent to grandparent position
+        if (root == grandparent) {
+            root = parent;
+        } else {
+            if (grandparent.isRightChild(grandparent.parent)) {
+                grandparent.parent.right = parent;
+            } else {
+                grandparent.parent.left = parent;
+            }
+        }
+        parent.parent = grandparent.parent;
+        grandparent.parent = parent;
+
+//        moves grandparent to parent's child
+        if (node.isRightChild(parent)) {
+            sibling = parent.left;
+            parent.left = grandparent;
+        } else {
+            sibling = parent.right;
+            parent.right = grandparent;
+        }
+
+        grandparent.left = sibling;
+
+        parent.isRed = false;
+        grandparent.isRed = true;
     }
 
     Node find(String key) {
         // TODO - Search for the node with the given key
         // If the key exists in the tree, return the Node where it is located
-        // Otherwise, return null
+        // Otherwise, return a node with a null key
         Node current = root;
         while (current.key != null && current.key != key) {
             if (key.compareTo(current.key) < 0) {
