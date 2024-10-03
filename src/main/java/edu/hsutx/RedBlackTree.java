@@ -53,6 +53,9 @@ public class RedBlackTree<E> {
         public int getDepth() {
             // TODO - calculate the depth of the node and return an int value.
             // Hint: follow parent pointers up to the root and count steps
+            if (this.key == null) {
+                return 0;
+            }
             int depth = 1;  //start including the node being checked
             Node current = this.parent;
             while (current != null) {
@@ -63,7 +66,9 @@ public class RedBlackTree<E> {
         }
 
         public int getBlackDepth() {
-            // TODO - calculate the depth of the node counting only black nodes and return an int value
+            if (this.key == null) {
+                return 0;
+            }
             int depth = 1;  //start including the node being checked
             Node current = this.parent;
             while (current != null) {
@@ -114,6 +119,55 @@ public class RedBlackTree<E> {
         // 3. Node to be deleted has two children
         // Additionally, you must handle rebalancing after deletion to restore Red-Black Tree properties
         // make sure to subtract one from size if node is successfully added
+        Node delNode = find(key);
+        if (delNode.key == null) {
+            return;
+        }
+        Node parent = delNode.parent;
+
+        int numChildren = 1;
+        if (delNode.left.key == null && delNode.right.key == null) {
+            numChildren = 0;
+        } else if (delNode.left.key != null && delNode.right.key != null) {
+            numChildren = 2;
+        }
+
+        switch (numChildren) {
+            case 0:
+                //no children
+                if (delNode == root) {
+                    root = null;
+                    return;
+                }
+
+                if (delNode.isRightChild(delNode.parent)) {
+                    delNode.parent.right = null;
+                } else {
+                    delNode.parent.left = null;
+                }
+                return;
+
+            case 1:
+                //one child
+                Node child;
+                if (delNode.right.key != null) {
+                    child = delNode.right;
+                } else {
+                    child = delNode.left;
+                }
+                if (delNode == root) {
+                    root = child;
+                    root.isRed = false;
+                    return;
+                }
+
+                if (delNode.isRightChild(parent)) {
+                    parent.right = child;
+                } else {
+                    parent.left = child;
+                }
+                child.parent = parent;
+        }
     }
 
     private void fixInsertion(Node node) {
@@ -237,6 +291,9 @@ public class RedBlackTree<E> {
         // If the key exists in the tree, return the Node where it is located
         // Otherwise, return a node with a null key
         Node current = root;
+        if (current == null) {
+            return new Node(null);
+        }
         while (current.key != null && current.key != key) {
             if (key.compareTo(current.key) < 0) {
                 current = current.left;
@@ -251,7 +308,7 @@ public class RedBlackTree<E> {
         // TODO - Use find() to locate the node with the given key and return its value
         // If the key does not exist, return null
         Node getNode = find(key);
-        if (getNode.key == null) {
+        if (getNode == null || getNode.key == null) {
             return null;
         }
         return getNode.value;
