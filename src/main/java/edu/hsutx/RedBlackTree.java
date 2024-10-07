@@ -79,8 +79,12 @@ public class RedBlackTree<E> {
             return depth;
         }
 
-        public boolean isRightChild(Node n) {
-            return n.right == this;
+        public boolean isRightChild() {
+            if (this.parent == null || this.parent.right != this) {
+                return false;
+            } else {
+                return true;
+            }
         }
 
         public Node getNearNephew() {
@@ -88,7 +92,7 @@ public class RedBlackTree<E> {
                 return null;
             }
 
-            if (this.isRightChild(this.parent)) {
+            if (this.isRightChild()) {
                 return this.parent.left.right;
             } else {
                 return this.parent.right.left;
@@ -100,7 +104,7 @@ public class RedBlackTree<E> {
                 return null;
             }
 
-            if (this.isRightChild(this.parent)) {
+            if (this.isRightChild()) {
                 return this.parent.left.left;
             } else {
                 return this.parent.right.right;
@@ -167,7 +171,7 @@ public class RedBlackTree<E> {
 
                 replacement = new Node(delNode.parent);
 
-                if (delNode.isRightChild(delNode.parent)) {
+                if (delNode.isRightChild()) {
                     delNode.parent.right = replacement;
                 } else {
                     delNode.parent.left = replacement;
@@ -188,7 +192,7 @@ public class RedBlackTree<E> {
                     return;
                 }
 
-                if (delNode.isRightChild(parent)) {
+                if (delNode.isRightChild()) {
                     parent.right = child;
                 } else {
                     parent.left = child;
@@ -239,41 +243,42 @@ public class RedBlackTree<E> {
         }
     }
 
-    private void fixInsertion(Node node) {
+    private void fixInsertion(Node newNode) {
         // TODO - Implement the fix-up procedure after insertion
         // Ensure that Red-Black Tree properties are maintained (recoloring and rotations).
         // You must handle rebalancing the tree after inserting
         // Recolor and rotate to restore Red-Black Tree properties.
         // Hint: You will need to deal with red-red parent-child conflicts
-        if (node == root) {
-            node.isRed = false;
+        if (newNode == root) {
+            newNode.isRed = false;
             return;
         }
-        if (!node.parent.isRed) {
+        if (!newNode.parent.isRed) {
             return;     //no color conflicts
         }
 
-        Node parent = node.parent;
-        Node uncle = getUncle(node);
+        Node parent = newNode.parent;
+        Node uncle = getUncle(newNode);
         Node grandparent = uncle.parent;
         if (uncle.isRed) {
-            node.parent.isRed = false;
+            newNode.parent.isRed = false;
             uncle.isRed = false;
             grandparent.isRed = true;
             fixInsertion(grandparent);
             return;
         }
 
-        if (node.isRightChild(parent) && parent.isRightChild(grandparent)) {
-            rotateLeft(node);
-        } else if (node.isRightChild(parent) && !parent.isRightChild(grandparent)) {
-            rotateLeft(node.right);
-            rotateRight(node);
-        } else if (parent.isRightChild(grandparent)) {
-            rotateRight(node.left);
-            rotateLeft(node);
+        //TODO - pass inserted node's parent
+        if (newNode.isRightChild() && parent.isRightChild()) {
+            rotateLeft(newNode.parent);
+        } else if (newNode.isRightChild() && !parent.isRightChild()) {
+//            rotateLeft(newNode.right);
+//            rotateRight(newNode);
+        } else if (parent.isRightChild()) {
+//            rotateRight(newNode.left);
+//            rotateLeft(newNode);
         } else {
-            rotateRight(node);
+            rotateRight(newNode.parent);
         }
     }
 
@@ -286,7 +291,7 @@ public class RedBlackTree<E> {
         }
 
         Node sibling = null;
-        if (x.isRightChild(x.parent)) {
+        if (x.isRightChild()) {
             sibling = x.parent.left;
         } else {
             sibling = x.parent.right;
@@ -295,7 +300,7 @@ public class RedBlackTree<E> {
         if (sibling.isRed) {
             sibling.isRed = false;
             x.parent.isRed = true;
-            if (x.isRightChild(x.parent)) {
+            if (x.isRightChild()) {
                 rotateRight(x.parent);
                 sibling = x.parent.right;
             } else {
@@ -321,7 +326,7 @@ public class RedBlackTree<E> {
         if (!sibling.isRed) {
             if (x.getNearNephew().isRed && !x.getFarNephew().isRed) {
                 x.getNearNephew().isRed = false;
-                if (x.isRightChild(x.parent)) {
+                if (x.isRightChild()) {
                     rotateLeft(sibling);
                     sibling = x.parent.left;
                 } else {
@@ -334,7 +339,7 @@ public class RedBlackTree<E> {
                 sibling.isRed = x.parent.isRed;
                 x.parent.isRed = false;
                 x.getFarNephew().isRed = false;
-                if (x.isRightChild(x.parent)) {
+                if (x.isRightChild()) {
                     rotateRight(x.parent);
                 } else {
                     rotateLeft(x.parent);
@@ -343,46 +348,61 @@ public class RedBlackTree<E> {
         }
     }
 
+    /**
+     * Method to rotate a segment of the tree left.
+     *
+     * @param node The right child moving up to its parent's position
+     */
     private void rotateLeft(Node node) {
-        // TODO - Implement left rotation
+        // TODO - change so that node is the parent of the inserted node/x
         // Left rotation is used to restore balance after insertion or deletion
         Node parent = node.parent;
-        Node grandparent = parent.parent;
-        Node sibling;
+        Node leftChild = node.left;
 
-
-        //moves the parent to the grandparent's position
-        if (grandparent == root) {
-            root = parent;
-        } else {
-            if (grandparent.isRightChild(grandparent.parent)) {
-                grandparent.parent.right = parent;
-            } else {
-                grandparent.parent.left = parent;
-            }
-        }
-        parent.parent = grandparent.parent;
-        grandparent.parent = parent;
-
-
-        //moves the grandparent to the parent's child
-        if (node.isRightChild(parent)) {
-            sibling = parent.left;
-            parent.left = grandparent;
-        } else {
-            sibling = parent.right;
-            parent.right = grandparent;
+        if (parent == root) {
+            root = node;
+            node.isRed = false;
         }
 
-        //moves the sibling to the grandparent's child, should always be right child for left rotation
-        grandparent.right = sibling;
+        node.parent = parent.parent;
+        node.left = parent;
+        parent.parent = node;
+        parent.right = leftChild;
 
-        parent.isRed = false;
-        grandparent.isRed = true;
+
+//
+//        //moves the parent to the grandparent's position
+//        if (grandparent == root) {
+//            root = parent;
+//        } else {
+//            if (grandparent.isRightChild(grandparent.parent)) {
+//                grandparent.parent.right = parent;
+//            } else {
+//                grandparent.parent.left = parent;
+//            }
+//        }
+//        parent.parent = grandparent.parent;
+//        grandparent.parent = parent;
+//
+//
+//        //moves the grandparent to the parent's child
+//        if (node.isRightChild(parent)) {
+//            sibling = parent.left;
+//            parent.left = grandparent;
+//        } else {
+//            sibling = parent.right;
+//            parent.right = grandparent;
+//        }
+//
+//        //moves the sibling to the grandparent's child, should always be right child for left rotation
+//        grandparent.right = sibling;
+//
+//        parent.isRed = false;
+//        grandparent.isRed = true;
     }
 
     private void rotateRight(Node node) {
-        // TODO - Implement right rotation
+        // TODO - change so that node is the parent of the inserted node/x
         // Right rotation is used to restore balance after insertion or deletion
         Node parent = node.parent;
         Node grandparent = parent.parent;
@@ -392,7 +412,7 @@ public class RedBlackTree<E> {
         if (root == grandparent) {
             root = parent;
         } else {
-            if (grandparent.isRightChild(grandparent.parent)) {
+            if (grandparent.isRightChild()) {
                 grandparent.parent.right = parent;
             } else {
                 grandparent.parent.left = parent;
@@ -402,7 +422,7 @@ public class RedBlackTree<E> {
         grandparent.parent = parent;
 
 //        moves grandparent to parent's child
-        if (node.isRightChild(parent)) {
+        if (node.isRightChild()) {
             sibling = parent.left;
             parent.left = grandparent;
         } else {
@@ -444,10 +464,10 @@ public class RedBlackTree<E> {
 
     private Node getUncle(Node n) {
         Node grandparent = n.parent.parent;
-        if (grandparent.left == n.parent) {
-            return grandparent.right;
-        } else {
+        if (n.parent.isRightChild()) {
             return grandparent.left;
+        } else {
+            return grandparent.right;
         }
     }
 
