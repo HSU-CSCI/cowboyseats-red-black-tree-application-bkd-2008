@@ -83,6 +83,30 @@ public class RedBlackTree<E> {
         public boolean isRightChild(Node n) {
             return n.right == this;
         }
+
+        public Node getNearNephew() {
+            if (this.parent == null) {
+                return null;
+            }
+
+            if (this.isRightChild(this.parent)) {
+                return this.parent.left.right;
+            } else {
+                return this.parent.right.left;
+            }
+        }
+
+        public Node getFarNephew() {
+            if (this.parent == null) {
+                return null;
+            }
+
+            if (this.isRightChild(this.parent)) {
+                return this.parent.left.left;
+            } else {
+                return this.parent.right.right;
+            }
+        }
     }
 
     public RedBlackTree() {
@@ -124,6 +148,8 @@ public class RedBlackTree<E> {
             return;
         }
         Node parent = delNode.parent;
+        Node replacement = new Node(null);
+        Node x = new Node(null);
 
         int numChildren = 1;
         if (delNode.left.key == null && delNode.right.key == null) {
@@ -140,10 +166,12 @@ public class RedBlackTree<E> {
                     return;
                 }
 
+                replacement = new Node(delNode.parent);
+
                 if (delNode.isRightChild(delNode.parent)) {
-                    delNode.parent.right = null;
+                    delNode.parent.right = replacement;
                 } else {
-                    delNode.parent.left = null;
+                    delNode.parent.left = replacement;
                 }
                 return;
 
@@ -167,6 +195,48 @@ public class RedBlackTree<E> {
                     parent.left = child;
                 }
                 child.parent = parent;
+                replacement = child;
+
+            case 2:
+                Node successor = delNode.right;
+                while (successor.left.key != null) {
+                    successor = successor.left;
+                }
+
+                if (delNode.right != successor) {
+                    successor.parent.left = successor.right;
+                } else {
+                    delNode.right = successor.right;
+                }
+                if (delNode == root) {
+                    root = successor;
+                }
+                x = successor.right;
+                successor.parent = delNode.parent;
+                successor.left = delNode.left;
+                successor.right = delNode.right;
+                successor.left.parent = successor;
+                successor.right.parent = successor;
+        }
+
+
+        if (delNode.isRed) {
+            if (replacement.isRed || replacement.key == null) {
+                return;
+            } else {
+                replacement.isRed = true;
+                fixDeletion(replacement);
+            }
+        } else {
+            if (replacement.isRed) {
+                replacement.isRed = false;
+            } else {
+                if (replacement == root) {
+                    return;
+                } else {
+                    fixDeletion(x);
+                }
+            }
         }
     }
 
@@ -208,9 +278,70 @@ public class RedBlackTree<E> {
         }
     }
 
-    private void fixDeletion(Node node) {
+    private void fixDeletion(Node x) {
         // TODO - Implement the fix-up procedure after deletion
         // Ensure that Red-Black Tree properties are maintained (recoloring and rotations).
+        if (x.isRed) {
+            x.isRed = false;
+            return;
+        }
+
+        Node sibling = null;
+        if (x.isRightChild(x.parent)) {
+            sibling = x.parent.left;
+        } else {
+            sibling = x.parent.right;
+        }
+
+        if (sibling.isRed) {
+            sibling.isRed = false;
+            x.parent.isRed = true;
+            if (x.isRightChild(x.parent)) {
+                rotateRight(x.parent);
+                sibling = x.parent.right;
+            } else {
+                rotateLeft(x.parent);
+                sibling = x.parent.left;
+            }
+        }
+
+        if (!sibling.right.isRed && !sibling.left.isRed) {
+            sibling.isRed = true;
+            x = x.parent;
+            if (x.isRed) {
+                x.isRed = false;
+                return;
+            } else if (root == x) {
+                return;
+            } else {
+                fixDeletion(x);
+                return;
+            }
+        }
+
+        if (!sibling.isRed) {
+            if (x.getNearNephew().isRed && !x.getFarNephew().isRed) {
+                x.getNearNephew().isRed = false;
+                if (x.isRightChild(x.parent)) {
+                    rotateLeft(sibling);
+                    sibling = x.parent.left;
+                } else {
+                    rotateRight(sibling);
+                    sibling = x.parent.right;
+                }
+            }
+
+            if (x.getFarNephew().isRed && !x.getNearNephew().isRed) {
+                sibling.isRed = x.parent.isRed;
+                x.parent.isRed = false;
+                x.getFarNephew().isRed = false;
+                if (x.isRightChild(x.parent)) {
+                    rotateRight(x.parent);
+                } else {
+                    rotateLeft(x.parent);
+                }
+            }
+        }
     }
 
     private void rotateLeft(Node node) {
@@ -294,7 +425,7 @@ public class RedBlackTree<E> {
         if (current == null) {
             return new Node(null);
         }
-        while (current.key != null && current.key != key) {
+        while (current.key != null && !current.key.equals(key)) {
             if (key.compareTo(current.key) < 0) {
                 current = current.left;
             } else {
