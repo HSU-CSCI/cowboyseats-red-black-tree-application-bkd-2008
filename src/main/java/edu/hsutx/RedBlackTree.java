@@ -51,7 +51,6 @@ public class RedBlackTree<E> {
 
         // TODO - add comments as appropriate including a javadoc for each method
         public int getDepth() {
-            // TODO - calculate the depth of the node and return an int value.
             // Hint: follow parent pointers up to the root and count steps
             if (this.key == null) {
                 return 0;
@@ -418,7 +417,6 @@ public class RedBlackTree<E> {
     }
 
     Node find(String key) {
-        // TODO - Search for the node with the given key
         // If the key exists in the tree, return the Node where it is located
         // Otherwise, return a node with a null key
         Node current = root;
@@ -436,7 +434,6 @@ public class RedBlackTree<E> {
     }
 
     public E getValue(String key) {
-        // TODO - Use find() to locate the node with the given key and return its value
         // If the key does not exist, return null
         Node getNode = find(key);
         if (getNode == null || getNode.key == null) {
