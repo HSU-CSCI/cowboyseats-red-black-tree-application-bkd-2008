@@ -199,6 +199,7 @@ public class RedBlackTree<E> {
                 }
                 child.parent = parent;
                 replacement = child;
+                break;
 
             case 2:
                 Node successor = delNode.right;
@@ -220,6 +221,7 @@ public class RedBlackTree<E> {
                 successor.right = delNode.right;
                 successor.left.parent = successor;
                 successor.right.parent = successor;
+                break;
         }
 
 
@@ -268,15 +270,14 @@ public class RedBlackTree<E> {
             return;
         }
 
-        //TODO - pass inserted node's parent
         if (newNode.isRightChild() && parent.isRightChild()) {
             rotateLeft(newNode.parent);
         } else if (newNode.isRightChild() && !parent.isRightChild()) {
-//            rotateLeft(newNode.right);
-//            rotateRight(newNode);
+            rotateLeft(newNode);
+            rotateRight(newNode);
         } else if (parent.isRightChild()) {
-//            rotateRight(newNode.left);
-//            rotateLeft(newNode);
+            rotateRight(newNode);
+            rotateLeft(newNode);
         } else {
             rotateRight(newNode.parent);
         }
@@ -287,6 +288,10 @@ public class RedBlackTree<E> {
         // Ensure that Red-Black Tree properties are maintained (recoloring and rotations).
         if (x.isRed) {
             x.isRed = false;
+            return;
+        }
+
+        if (x == root) {
             return;
         }
 
@@ -368,6 +373,8 @@ public class RedBlackTree<E> {
         node.left = parent;
         parent.parent = node;
         parent.right = leftChild;
+        node.isRed = false;
+        parent.isRed = true;
 
 
 //
@@ -405,35 +412,46 @@ public class RedBlackTree<E> {
         // TODO - change so that node is the parent of the inserted node/x
         // Right rotation is used to restore balance after insertion or deletion
         Node parent = node.parent;
-        Node grandparent = parent.parent;
-        Node sibling;
+        Node rightChild = node.right;
 
-        //moves parent to grandparent position
-        if (root == grandparent) {
-            root = parent;
-        } else {
-            if (grandparent.isRightChild()) {
-                grandparent.parent.right = parent;
-            } else {
-                grandparent.parent.left = parent;
-            }
-        }
-        parent.parent = grandparent.parent;
-        grandparent.parent = parent;
-
-//        moves grandparent to parent's child
-        if (node.isRightChild()) {
-            sibling = parent.left;
-            parent.left = grandparent;
-        } else {
-            sibling = parent.right;
-            parent.right = grandparent;
+        if (parent == root) {
+            root = node;
+            node.isRed = false;
         }
 
-        grandparent.left = sibling;
+        node.parent = parent.parent;
+        node.right = parent;
+        parent.parent = node;
+        parent.left = rightChild;
+        node.isRed = false;
+        parent.isRed = true;
 
-        parent.isRed = false;
-        grandparent.isRed = true;
+//        //moves parent to grandparent position
+//        if (root == grandparent) {
+//            root = parent;
+//        } else {
+//            if (grandparent.isRightChild()) {
+//                grandparent.parent.right = parent;
+//            } else {
+//                grandparent.parent.left = parent;
+//            }
+//        }
+//        parent.parent = grandparent.parent;
+//        grandparent.parent = parent;
+//
+////        moves grandparent to parent's child
+//        if (node.isRightChild()) {
+//            sibling = parent.left;
+//            parent.left = grandparent;
+//        } else {
+//            sibling = parent.right;
+//            parent.right = grandparent;
+//        }
+//
+//        grandparent.left = sibling;
+//
+//        parent.isRed = false;
+//        grandparent.isRed = true;
     }
 
     Node find(String key) {
@@ -484,11 +502,11 @@ public class RedBlackTree<E> {
 
     // Helper methods to check the color of a node
     private boolean isRed(Node node) {
-        return node != null && node.isRed == true; // Red is true
+        return node != null && node.isRed; // Red is true
     }
 
     private boolean isBlack(Node node) {
-        return node == null || node.isRed == false; // Black is false, and null nodes are black
+        return node == null || node.isRed; // Black is false, and null nodes are black
     }
     public int getSize() {
         return size;
