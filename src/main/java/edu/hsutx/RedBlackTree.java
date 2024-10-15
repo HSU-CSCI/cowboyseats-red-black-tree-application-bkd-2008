@@ -366,12 +366,16 @@ public class RedBlackTree<E> {
 
         if (parent == root) {
             root = node;
-            node.isRed = false;
         }
 
         node.parent = parent.parent;
+        if (node.parent != null && parent.isRightChild()) {
+            node.parent.right = node;
+        } else if (node.parent != null && !parent.isRightChild()) {
+            node.parent.left = node;
+        }
         node.left = parent;
-        parent.parent = node;
+        parent.parent = node;   //now left child of node
         parent.right = leftChild;
         node.isRed = false;
         parent.isRed = true;
@@ -392,8 +396,13 @@ public class RedBlackTree<E> {
         }
 
         node.parent = parent.parent;
+        if (node.parent != null && parent.isRightChild()) {
+            node.parent.right = node;
+        } else if (node.parent != null && !parent.isRightChild()) {
+            node.parent.left = node;
+        }
         node.right = parent;
-        parent.parent = node;
+        parent.parent = node;   //now right child of node
         parent.left = rightChild;
         node.isRed = false;
         parent.isRed = true;
