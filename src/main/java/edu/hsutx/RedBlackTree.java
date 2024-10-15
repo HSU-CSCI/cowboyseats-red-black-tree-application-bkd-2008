@@ -377,35 +377,7 @@ public class RedBlackTree<E> {
         parent.isRed = true;
 
 
-//
-//        //moves the parent to the grandparent's position
-//        if (grandparent == root) {
-//            root = parent;
-//        } else {
-//            if (grandparent.isRightChild(grandparent.parent)) {
-//                grandparent.parent.right = parent;
-//            } else {
-//                grandparent.parent.left = parent;
-//            }
-//        }
-//        parent.parent = grandparent.parent;
-//        grandparent.parent = parent;
-//
-//
-//        //moves the grandparent to the parent's child
-//        if (node.isRightChild(parent)) {
-//            sibling = parent.left;
-//            parent.left = grandparent;
-//        } else {
-//            sibling = parent.right;
-//            parent.right = grandparent;
-//        }
-//
-//        //moves the sibling to the grandparent's child, should always be right child for left rotation
-//        grandparent.right = sibling;
-//
-//        parent.isRed = false;
-//        grandparent.isRed = true;
+
     }
 
     private void rotateRight(Node node) {
@@ -426,32 +398,7 @@ public class RedBlackTree<E> {
         node.isRed = false;
         parent.isRed = true;
 
-//        //moves parent to grandparent position
-//        if (root == grandparent) {
-//            root = parent;
-//        } else {
-//            if (grandparent.isRightChild()) {
-//                grandparent.parent.right = parent;
-//            } else {
-//                grandparent.parent.left = parent;
-//            }
-//        }
-//        parent.parent = grandparent.parent;
-//        grandparent.parent = parent;
-//
-////        moves grandparent to parent's child
-//        if (node.isRightChild()) {
-//            sibling = parent.left;
-//            parent.left = grandparent;
-//        } else {
-//            sibling = parent.right;
-//            parent.right = grandparent;
-//        }
-//
-//        grandparent.left = sibling;
-//
-//        parent.isRed = false;
-//        grandparent.isRed = true;
+
     }
 
     Node find(String key) {
